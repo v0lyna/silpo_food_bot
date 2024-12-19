@@ -25,17 +25,7 @@ def create_main_menu_keyboard():
     btn2 = KeyboardButton('Напої')
     btn3 = KeyboardButton('Солодощі')
     keyboard.add(btn1, btn2, btn3)
-    return keyboard
-
-
-def create_secondary_menu_keyboard():
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
-    btn1 = KeyboardButton('Акції')
-    btn2 = KeyboardButton('Кошик')
-    btn3 = KeyboardButton('Доставка')
-    btn4 = KeyboardButton('Контакти')
-    keyboard.add(btn1)
-    keyboard.add(btn2, btn3, btn4)
+    keyboard.add(KeyboardButton('Мої замовлення'), KeyboardButton('Очистити замовлення'))
     return keyboard
 
 
@@ -54,9 +44,15 @@ def create_products_menu_keyboard():
 
 
 def create_category_products_keyboard(category):
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     products = get_products_keyboard(category)
+    buttons = []
     for product in products:
-        keyboard.add(KeyboardButton(product))
+        buttons.append(KeyboardButton(f"Замовити {product}"))
+
+    for i in range(0, len(buttons)):
+        keyboard.add(buttons[i])
+
     keyboard.add(KeyboardButton('Назад до категорій'))
+    keyboard.add(KeyboardButton('Мої замовлення'), KeyboardButton('Очистити замовлення'))
     return keyboard

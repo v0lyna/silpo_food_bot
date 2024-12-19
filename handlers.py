@@ -1,16 +1,20 @@
+from datetime import datetime
 from telebot import TeleBot
-from config import WELCOME_MESSAGE, HELP_MESSAGE, STORE_INFO, WELCOME_IMAGE_PATH, WEB_SITE
+from config import DB_FILE, WELCOME_MESSAGE, HELP_MESSAGE, STORE_INFO, WELCOME_IMAGE_PATH
 from keyboards import (
     create_inline_welcome_keyboard,
     create_main_menu_keyboard,
-    create_secondary_menu_keyboard,
     create_products_menu_keyboard,
     create_category_products_keyboard,
     create_inline_website_keyboard,
 )
+from database import Database
+from products import PRODUCTS
 
 
 def register_handlers(bot: TeleBot):
+    db = Database(DB_FILE)
+
     @bot.message_handler(commands=['start'])
     def start(message):
         bot.send_message(
@@ -83,15 +87,52 @@ def register_handlers(bot: TeleBot):
                 f"Виберіть {message.text.lower()}:",
                 reply_markup=create_category_products_keyboard(message.text)
             )
-        elif message.text == 'Акції':
-            bot.send_message(
-                message.chat.id,
-                "Актуальні акції та знижки:",
-                reply_markup=create_secondary_menu_keyboard()
-            )
-        elif message.text == 'Кошик':
-            # TODO: Реалізувати функціонал кошика
-            bot.send_message(
-                message.chat.id,
-                "Ваш кошик поки що порожній"
-            )
+        elif message.text.startswith('Замовити '):
+            product_info = message.text.replace('Замовити ', '')
+            product_name = product_info.split(' - ')[0]
+
+            for category in PRODUCTS:
+                for product in PRODUCTS[category]:
+                    if product['name'] == product_name:
+                        db.add_order(
+                            message.from_user.id,
+                            message.from_user.username,
+                            product_name,
+                            product['price']
+                        )
+
+                        bot.send_message(
+                            message.chat.id,
+                            f"Товар '{product_name}' додано до замовлень!"
+                        )
+                        return
+
+        elif message.text == 'Мої замовлення':
+            orders = db.get_user_orders(message.from_user.id)
+            if orders:
+                orders_text = "Ваші замовлення:\n\n"
+                total_price = 0
+                for product, price, order_time in orders:
+                    order_time = datetime.strptime(order_time, "%Y-%m-%d %H:%M:%S.%f")
+                    orders_text += f"• {product} - {price}₴ ({order_time:%Y-%m-%d %H:%M})\n"
+                    total_price += price
+                orders_text += f"\nЗагальна сума: {total_price:.1f}₴"
+                bot.send_message(message.chat.id, orders_text)
+            else:
+                bot.send_message(
+                    message.chat.id,
+                    "У вас поки немає замовлень"
+                )
+
+        elif message.text == 'Очистити замовлення':
+            deleted_count = db.clear_user_orders(message.from_user.id)
+            if deleted_count > 0:
+                bot.send_message(
+                    message.chat.id,
+                    f"Видалено {deleted_count} замовлень"
+                )
+            else:
+                bot.send_message(
+                    message.chat.id,
+                    "У вас немає замовлень для видалення"
+                )
