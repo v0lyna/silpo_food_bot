@@ -32,7 +32,6 @@ def register_handlers(bot: TeleBot):
             reply_markup=keyboard
         )
 
-
     @bot.message_handler(commands=['inform'])
     def inform(message):
         keyboard = create_inline_welcome_keyboard()
