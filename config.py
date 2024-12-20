@@ -2,7 +2,7 @@ DB_FILE = 'orders.db'
 
 BOT_TOKEN = ''
 
-WELCOME_IMAGE_PATH = './images/silpo_welcome.jpg'
+WELCOME_IMAGE_PATH = 'images/silpo_welcome.jpg'
 
 WELCOME_MESSAGE = """
 Вітаємо у боті Сільпо!

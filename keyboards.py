@@ -1,58 +1,87 @@
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-from telebot.types import ReplyKeyboardMarkup, KeyboardButton
-
+from aiogram.types import (
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    ReplyKeyboardMarkup,
+    KeyboardButton
+)
 from config import WEB_SITE
 from products import get_products_keyboard
 
 
-def create_inline_website_keyboard():
-    keyboard = InlineKeyboardMarkup()
-    welcome_button = InlineKeyboardButton(text="Відкрити сайт Сільпо", url=WEB_SITE)
-    keyboard.add(welcome_button)
+def create_inline_website_keyboard() -> InlineKeyboardMarkup:
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Відкрити сайт Сільпо", url=WEB_SITE)]
+    ])
     return keyboard
 
 
-def create_inline_welcome_keyboard():
-    keyboard = InlineKeyboardMarkup()
-    welcome_button = InlineKeyboardButton(text="Привітання", callback_data="welcome")
-    keyboard.add(welcome_button)
+def create_inline_welcome_keyboard() -> InlineKeyboardMarkup:
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Привітання", callback_data="welcome")]
+    ])
     return keyboard
 
 
-def create_main_menu_keyboard():
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
-    btn1 = KeyboardButton('Продукти')
-    btn2 = KeyboardButton('Напої')
-    btn3 = KeyboardButton('Солодощі')
-    keyboard.add(btn1, btn2, btn3)
-    keyboard.add(KeyboardButton('Мої замовлення'), KeyboardButton('Очистити замовлення'))
+def create_main_menu_keyboard() -> ReplyKeyboardMarkup:
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [
+                KeyboardButton(text='Продукти'),
+                KeyboardButton(text='Напої'),
+                KeyboardButton(text='Солодощі')
+            ],
+            [
+                KeyboardButton(text='Мої замовлення'),
+                KeyboardButton(text='Очистити замовлення')
+            ]
+        ],
+        resize_keyboard=True,
+        row_width=3
+    )
     return keyboard
 
 
-def create_products_menu_keyboard():
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
-    btn1 = KeyboardButton('М\'ясо')
-    btn2 = KeyboardButton('Риба')
-    btn3 = KeyboardButton('Овочі')
-    btn4 = KeyboardButton('Фрукти')
-    btn5 = KeyboardButton('Бакалія')
-    btn_back = KeyboardButton('Назад до меню')
-    keyboard.add(btn1, btn2)
-    keyboard.add(btn3, btn4, btn5)
-    keyboard.add(btn_back)
+def create_products_menu_keyboard() -> ReplyKeyboardMarkup:
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [
+                KeyboardButton(text='М\'ясо'),
+                KeyboardButton(text='Риба')
+            ],
+            [
+                KeyboardButton(text='Овочі'),
+                KeyboardButton(text='Фрукти'),
+                KeyboardButton(text='Бакалія')
+            ],
+            [KeyboardButton(text='Назад до меню')]
+        ],
+        resize_keyboard=True,
+        row_width=3
+    )
     return keyboard
 
 
-def create_category_products_keyboard(category):
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+def create_category_products_keyboard(category: str) -> ReplyKeyboardMarkup:
     products = get_products_keyboard(category)
-    buttons = []
-    for product in products:
-        buttons.append(KeyboardButton(f"Замовити {product}"))
 
-    for i in range(0, len(buttons)):
-        keyboard.add(buttons[i])
+    product_buttons = [
+        [KeyboardButton(text=f"Замовити {product}")]
+        for product in products
+    ]
 
-    keyboard.add(KeyboardButton('Назад до категорій'))
-    keyboard.add(KeyboardButton('Мої замовлення'), KeyboardButton('Очистити замовлення'))
+    # Додаємо навігаційні кнопки
+    navigation_buttons = [
+        [KeyboardButton(text='Назад до категорій')],
+        [
+            KeyboardButton(text='Мої замовлення'),
+            KeyboardButton(text='Очистити замовлення')
+        ]
+    ]
+
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=product_buttons + navigation_buttons,
+        resize_keyboard=True,
+        row_width=2
+    )
+
     return keyboard
