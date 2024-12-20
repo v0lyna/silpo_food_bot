@@ -54,13 +54,11 @@ async def callback_handler(call: CallbackQuery):
     if call.data == "welcome":
         try:
             photo = InputFile(WELCOME_IMAGE_PATH)
-            print(photo)
             await call.message.answer_photo(
                 photo,
                 caption=STORE_INFO
             )
         except Exception as e:
-            print(e)
             await call.message.answer(
                 f"Вибачте, виникла помилка при завантаженні зображення."
             )

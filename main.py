@@ -10,7 +10,6 @@ async def main():
 
     register_handlers(dp)
 
-    print("Бот запущений...")
     try:
         await dp.start_polling(bot)
     finally:
